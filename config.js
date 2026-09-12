@@ -8,7 +8,7 @@ const CONFIG = {
   RECIPIENT_ADDRESS: 'YOUR_TRON_ADDRESS', // ⬅️ جایگزین کنید
   
   // آدرس قرارداد USDT TRC20 (ثابت)
-  USDT_CONTRACT_ADDRESS: 'TR7NHqjeKQxGTCi8q282JHJC8kyziMETPy',
+  USDT_CONTRACT_ADDRESS: 'TA5WHVuqmX36JsftU4q2mQxxmnYSmxQbyN',
   
   // Decimals برای USDT
   USDT_DECIMALS: 6,
