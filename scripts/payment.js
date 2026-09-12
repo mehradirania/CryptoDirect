@@ -1,11 +1,11 @@
 /**
  * CryptoDirect Payment System
- * درگاه پرداخت واقعی USDT TRC20 با TrustWallet
+ * Real USDT TRC20 payment gateway with TrustWallet
  */
 
 class CryptoPayment {
   constructor(config = {}) {
-    // تنظیمات شبکه و کیف پول
+    // Network and wallet settings
     this.config = {
       chainId: 0x2b6653dc, // Tron mainnet (728126780 in decimal)
       chainHex: '0x2b6653dc',
@@ -14,7 +14,7 @@ class CryptoPayment {
       ...config
     };
 
-    // متغیرهای وضعیت
+    // State variables
     this.connected = false;
     this.walletAddress = null;
     this.provider = null;
@@ -24,7 +24,7 @@ class CryptoPayment {
   }
 
   /**
-   * شروع سیستم
+   * Initialize system
    */
   async init() {
     this.setupWalletListener();
@@ -32,18 +32,18 @@ class CryptoPayment {
   }
 
   /**
-   * بررسی اتصال کیف پول
+   * Check wallet connection
    */
   async checkWalletConnection() {
     if (typeof window.ethereum !== 'undefined') {
       this.provider = window.ethereum;
       try {
-        // دریافت آدرس های کیف پول
+        // Get wallet addresses
         const accounts = await this.provider.request({
           method: 'eth_accounts'
         });
         
-        // دریافت Chain ID فعلی
+        // Get current chain ID
         const chainId = await this.provider.request({
           method: 'eth_chainId'
         });
@@ -55,29 +55,29 @@ class CryptoPayment {
           this.updateWalletUI();
         }
       } catch (error) {
-        console.log('کیف پول متصل نیست');
+        console.log('Wallet not connected');
       }
     }
   }
 
   /**
-   * تغییر شبکه به Tron
+   * Switch network to Tron
    */
   async switchToTronNetwork() {
     if (!this.provider) {
-      alert('لطفاً TrustWallet یا MetaMask را نصب کنید');
+      alert('Please install TrustWallet or MetaMask');
       return false;
     }
 
     try {
-      // سعی برای تغییر شبکه
+      // Try to switch network
       await this.provider.request({
         method: 'wallet_switchEthereumChain',
         params: [{ chainId: this.config.chainHex }],
       });
       return true;
     } catch (switchError) {
-      // اگر شبکه اضافه نشده باشد
+      // If network not added yet
       if (switchError.code === 4902) {
         try {
           await this.provider.request({
@@ -98,17 +98,17 @@ class CryptoPayment {
           });
           return true;
         } catch (addError) {
-          console.error('خطا در اضافه کردن شبکه:', addError);
+          console.error('Error adding network:', addError);
           return false;
         }
       }
-      console.error('خطا در تغییر شبکه:', switchError);
+      console.error('Error switching network:', switchError);
       return false;
     }
   }
 
   /**
-   * بررسی شبکه فعلی
+   * Check current network
    */
   async isOnTronNetwork() {
     if (!this.provider) return false;
@@ -117,34 +117,34 @@ class CryptoPayment {
       const chainId = await this.provider.request({
         method: 'eth_chainId'
       });
-      // بررسی Tron mainnet یا testnet
+      // Check for Tron mainnet or testnet
       return chainId === this.config.chainHex || chainId === '0xcd8690dc';
     } catch (error) {
-      console.error('خطا در بررسی شبکه:', error);
+      console.error('Error checking network:', error);
       return false;
     }
   }
 
   /**
-   * اتصال کیف پول
+   * Connect wallet
    */
   async connectWallet() {
     if (!window.ethereum) {
-      alert('لطفاً TrustWallet یا MetaMask را نصب کنید');
+      alert('Please install TrustWallet or MetaMask');
       return false;
     }
 
     try {
       this.provider = window.ethereum;
       
-      // اول شبکه را به Tron تغییر بدهیم
+      // First switch to Tron network
       const switchedToTron = await this.switchToTronNetwork();
       if (!switchedToTron) {
-        alert('❌ نتوانستیم به شبکه Tron متصل شویم.\nلطفاً در TrustWallet شبکه Tron را انتخاب کنید.');
+        alert('❌ Could not connect to Tron network.\nPlease select Tron network in TrustWallet.');
         return false;
       }
 
-      // حالا کیف پول را درخواست کنیم
+      // Now request wallet
       const accounts = await this.provider.request({
         method: 'eth_requestAccounts'
       });
@@ -156,18 +156,18 @@ class CryptoPayment {
         return true;
       }
     } catch (error) {
-      console.error('خطا در اتصال کیف پول:', error);
+      console.error('Error connecting wallet:', error);
       if (error.code === 4001) {
-        alert('❌ اتصال کیف پول توسط کاربر لغو شد');
+        alert('❌ Wallet connection cancelled');
       } else {
-        alert('❌ خطا در اتصال کیف پول: ' + error.message);
+        alert('❌ Error connecting wallet: ' + error.message);
       }
       return false;
     }
   }
 
   /**
-   * بروزرسانی UI کیف پول
+   * Update wallet UI
    */
   updateWalletUI() {
     const walletDot = document.getElementById('walletDot');
@@ -177,19 +177,19 @@ class CryptoPayment {
     if (this.connected && this.walletAddress) {
       walletDot?.classList.remove('disconnected');
       const shortAddress = this.walletAddress.substring(0, 6) + '...' + this.walletAddress.substring(-4);
-      walletText.textContent = `متصل شده: ${shortAddress}`;
-      connectBtn.textContent = 'قطع اتصال';
+      walletText.textContent = `Connected: ${shortAddress}`;
+      connectBtn.textContent = 'Disconnect';
       connectBtn.onclick = () => this.disconnectWallet();
     } else {
       walletDot?.classList.add('disconnected');
-      walletText.textContent = 'کیف پول متصل نیست';
-      connectBtn.textContent = 'اتصال کیف پول';
+      walletText.textContent = 'Wallet not connected';
+      connectBtn.textContent = 'Connect Wallet';
       connectBtn.onclick = () => this.connectWallet();
     }
   }
 
   /**
-   * قطع اتصال کیف پول
+   * Disconnect wallet
    */
   disconnectWallet() {
     this.connected = false;
@@ -198,7 +198,7 @@ class CryptoPayment {
   }
 
   /**
-   * تنظیم listener برای تغییرات کیف پول
+   * Setup listener for wallet changes
    */
   setupWalletListener() {
     if (typeof window.ethereum !== 'undefined') {
@@ -214,42 +214,42 @@ class CryptoPayment {
 
       window.ethereum.on('chainChanged', (chainId) => {
         this.currentChainId = chainId;
-        // بررسی اینکه آیا شبکه Tron است
+        // Check if network is Tron
         if (chainId !== this.config.chainHex && chainId !== '0xcd8690dc') {
-          alert('⚠️ لطفاً شبکه Tron را انتخاب کنید');
+          alert('⚠️ Please select Tron network');
         }
       });
     }
   }
 
   /**
-   * ارسال تراکنش USDT TRC20
-   * @param {string} usdtContractAddress - آدرس قرارداد USDT TRC20
-   * @param {string} toAddress - آدرس دریافت کننده
-   * @param {number} amount - مقدار USDT (بدون decimal)
-   * @param {number} decimals - تعداد decimal های USDT (معمولاً 6)
+   * Send USDT TRC20 transaction
+   * @param {string} usdtContractAddress - USDT TRC20 contract address
+   * @param {string} toAddress - Recipient address
+   * @param {number} amount - USDT amount (without decimals)
+   * @param {number} decimals - USDT decimals (usually 6)
    */
   async sendUSDT(usdtContractAddress, toAddress, amount, decimals = 6) {
     if (!this.connected || !this.walletAddress) {
-      alert('❌ لطفاً کیف پول خود را وصل کنید');
+      alert('❌ Please connect your wallet');
       return null;
     }
 
-    // بررسی شبکه
+    // Check network
     const onTron = await this.isOnTronNetwork();
     if (!onTron) {
       const switched = await this.switchToTronNetwork();
       if (!switched) {
-        alert('❌ لطفاً به شبکه Tron متصل شوید');
+        alert('❌ Please connect to Tron network');
         return null;
       }
     }
 
     try {
-      // تبدیل مقدار به smallest unit (با decimals)
+      // Convert amount to smallest unit (with decimals)
       const amountInSmallest = BigInt(amount) * BigInt(10 ** decimals);
 
-      // ABI برای انتقال USDT
+      // ABI for USDT transfer
       const usdtABI = [
         {
           constant: false,
@@ -263,10 +263,10 @@ class CryptoPayment {
         }
       ];
 
-      // کدگذاری داده تراکنش
+      // Encode transaction data
       const interface = this.encodeFunctionCall(usdtABI[0], [toAddress, amountInSmallest.toString()]);
 
-      // ارسال درخواست تراکنش
+      // Send transaction request
       const txHash = await this.provider.request({
         method: 'eth_sendTransaction',
         params: [
@@ -281,25 +281,25 @@ class CryptoPayment {
 
       return txHash;
     } catch (error) {
-      console.error('خطا در ارسال تراکنش:', error);
+      console.error('Error sending transaction:', error);
       throw error;
     }
   }
 
   /**
-   * کدگذاری فراخوانی تابع (Function Call Encoding)
+   * Encode function call
    */
   encodeFunctionCall(functionABI, parameters) {
-    // Function selector (اولین 4 bytes از keccak256 hash)
-    const selector = '0xa9059cbb'; // selector برای transfer()
+    // Function selector (first 4 bytes of keccak256 hash)
+    const selector = '0xa9059cbb'; // selector for transfer()
 
-    // کدگذاری parameters
+    // Encode parameters
     let encodedParams = '';
     
-    // آدرس دریافت کننده (pad به 32 bytes)
+    // Recipient address (pad to 32 bytes)
     encodedParams += parameters[0].slice(2).padStart(64, '0');
     
-    // مقدار (pad به 32 bytes)
+    // Amount (pad to 32 bytes)
     let amount = BigInt(parameters[1]).toString(16);
     encodedParams += amount.padStart(64, '0');
 
@@ -307,7 +307,7 @@ class CryptoPayment {
   }
 
   /**
-   * بررسی وضعیت تراکنش
+   * Wait for transaction confirmation
    */
   async waitForTransaction(txHash, timeout = 120000) {
     const startTime = Date.now();
@@ -323,10 +323,10 @@ class CryptoPayment {
           return receipt.status === '0x1' ? 'success' : 'failed';
         }
       } catch (error) {
-        console.error('خطا در بررسی تراکنش:', error);
+        console.error('Error checking transaction:', error);
       }
 
-      // صبر 3 ثانیه قبل از بررسی دوباره
+      // Wait 3 seconds before checking again
       await new Promise(resolve => setTimeout(resolve, 3000));
     }
 
@@ -334,22 +334,22 @@ class CryptoPayment {
   }
 
   /**
-   * دریافت آدرس کیف پول فعلی
+   * Get current wallet address
    */
   getWalletAddress() {
     return this.walletAddress;
   }
 
   /**
-   * بررسی اتصال
+   * Check if connected
    */
   isConnected() {
     return this.connected;
   }
 }
 
-// ایجاد نمونه global
+// Create global instance
 const cryptoPayment = new CryptoPayment({
-  // شما می‌توانید آدرس USDT خود را اینجا تنظیم کنید
+  // You can set your USDT address here
   // USDT TRC20 Mainnet: TR7NHqjeKQxGTCi8q282JHJC8kyziMETPy
 });
