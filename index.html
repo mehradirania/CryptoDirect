@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="fa">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>CryptoDirect – فروشگاه کریپتو</title>
+  <title>CryptoDirect – Crypto Store</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     * {
@@ -16,7 +16,7 @@
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       min-height: 100vh;
       padding: 20px;
-      direction: rtl;
+      direction: ltr;
     }
 
     .header {
@@ -132,7 +132,7 @@
 
     .product-body {
       padding: 20px;
-      text-align: right;
+      text-align: left;
     }
 
     .product-name {
@@ -232,7 +232,7 @@
       font-size: 18px;
       font-weight: 700;
       color: #222;
-      text-align: right;
+      text-align: left;
     }
 
     .modal-close {
@@ -245,7 +245,7 @@
 
     .modal-body {
       padding: 24px;
-      text-align: right;
+      text-align: left;
     }
 
     .product-detail-image {
@@ -395,21 +395,21 @@
 <body>
   <div class="header">
     <h1>🪙 CryptoDirect</h1>
-    <p>فروشگاه پرداخت کریپتو - پرداخت با USDT TRC20</p>
+    <p>Crypto Payment Store - Pay with USDT TRC20</p>
   </div>
 
   <div class="wallet-status" id="walletStatus">
     <div class="wallet-info">
       <span class="wallet-dot disconnected" id="walletDot"></span>
-      <span id="walletText">کیف پول متصل نیست</span>
+      <span id="walletText">Wallet not connected</span>
     </div>
-    <button class="connect-wallet-btn" id="connectWalletBtn">اتصال کیف پول</button>
+    <button class="connect-wallet-btn" id="connectWalletBtn">Connect Wallet</button>
   </div>
 
   <div id="warningContainer"></div>
 
   <div class="products-container" id="productsContainer">
-    <div class="loading">در حال بارگذاری محصولات...</div>
+    <div class="loading">Loading products...</div>
   </div>
 
   <!-- Payment Modal -->
@@ -417,7 +417,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <button class="modal-close" id="closeModal">&times;</button>
-        <div class="modal-title" id="modalTitle">جزئیات محصول</div>
+        <div class="modal-title" id="modalTitle">Product Details</div>
       </div>
       <div class="modal-body" id="modalBody"></div>
     </div>
