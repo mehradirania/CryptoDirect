@@ -18,6 +18,7 @@ class CryptoPayment {
     this.connected = false;
     this.walletAddress = null;
     this.provider = null;
+    this.currentChainId = null;
     
     this.init();
   }
@@ -37,9 +38,17 @@ class CryptoPayment {
     if (typeof window.ethereum !== 'undefined') {
       this.provider = window.ethereum;
       try {
+        // دریافت آدرس های کیف پول
         const accounts = await this.provider.request({
           method: 'eth_accounts'
         });
+        
+        // دریافت Chain ID فعلی
+        const chainId = await this.provider.request({
+          method: 'eth_chainId'
+        });
+        this.currentChainId = chainId;
+
         if (accounts.length > 0) {
           this.walletAddress = accounts[0];
           this.connected = true;
@@ -48,6 +57,71 @@ class CryptoPayment {
       } catch (error) {
         console.log('کیف پول متصل نیست');
       }
+    }
+  }
+
+  /**
+   * تغییر شبکه به Tron
+   */
+  async switchToTronNetwork() {
+    if (!this.provider) {
+      alert('لطفاً TrustWallet یا MetaMask را نصب کنید');
+      return false;
+    }
+
+    try {
+      // سعی برای تغییر شبکه
+      await this.provider.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: this.config.chainHex }],
+      });
+      return true;
+    } catch (switchError) {
+      // اگر شبکه اضافه نشده باشد
+      if (switchError.code === 4902) {
+        try {
+          await this.provider.request({
+            method: 'wallet_addEthereumChain',
+            params: [
+              {
+                chainId: this.config.chainHex,
+                chainName: 'Tron Mainnet',
+                nativeCurrency: {
+                  name: 'TRX',
+                  symbol: 'TRX',
+                  decimals: 18,
+                },
+                rpcUrls: [this.config.rpcUrl],
+                blockExplorerUrls: [this.config.explorerUrl],
+              },
+            ],
+          });
+          return true;
+        } catch (addError) {
+          console.error('خطا در اضافه کردن شبکه:', addError);
+          return false;
+        }
+      }
+      console.error('خطا در تغییر شبکه:', switchError);
+      return false;
+    }
+  }
+
+  /**
+   * بررسی شبکه فعلی
+   */
+  async isOnTronNetwork() {
+    if (!this.provider) return false;
+    
+    try {
+      const chainId = await this.provider.request({
+        method: 'eth_chainId'
+      });
+      // بررسی Tron mainnet یا testnet
+      return chainId === this.config.chainHex || chainId === '0xcd8690dc';
+    } catch (error) {
+      console.error('خطا در بررسی شبکه:', error);
+      return false;
     }
   }
 
@@ -62,6 +136,15 @@ class CryptoPayment {
 
     try {
       this.provider = window.ethereum;
+      
+      // اول شبکه را به Tron تغییر بدهیم
+      const switchedToTron = await this.switchToTronNetwork();
+      if (!switchedToTron) {
+        alert('❌ نتوانستیم به شبکه Tron متصل شویم.\nلطفاً در TrustWallet شبکه Tron را انتخاب کنید.');
+        return false;
+      }
+
+      // حالا کیف پول را درخواست کنیم
       const accounts = await this.provider.request({
         method: 'eth_requestAccounts'
       });
@@ -74,6 +157,11 @@ class CryptoPayment {
       }
     } catch (error) {
       console.error('خطا در اتصال کیف پول:', error);
+      if (error.code === 4001) {
+        alert('❌ اتصال کیف پول توسط کاربر لغو شد');
+      } else {
+        alert('❌ خطا در اتصال کیف پول: ' + error.message);
+      }
       return false;
     }
   }
@@ -124,8 +212,12 @@ class CryptoPayment {
         }
       });
 
-      window.ethereum.on('chainChanged', () => {
-        window.location.reload();
+      window.ethereum.on('chainChanged', (chainId) => {
+        this.currentChainId = chainId;
+        // بررسی اینکه آیا شبکه Tron است
+        if (chainId !== this.config.chainHex && chainId !== '0xcd8690dc') {
+          alert('⚠️ لطفاً شبکه Tron را انتخاب کنید');
+        }
       });
     }
   }
@@ -139,8 +231,18 @@ class CryptoPayment {
    */
   async sendUSDT(usdtContractAddress, toAddress, amount, decimals = 6) {
     if (!this.connected || !this.walletAddress) {
-      alert('لطفاً کیف پول خود را وصل کنید');
+      alert('❌ لطفاً کیف پول خود را وصل کنید');
       return null;
+    }
+
+    // بررسی شبکه
+    const onTron = await this.isOnTronNetwork();
+    if (!onTron) {
+      const switched = await this.switchToTronNetwork();
+      if (!switched) {
+        alert('❌ لطفاً به شبکه Tron متصل شوید');
+        return null;
+      }
     }
 
     try {
