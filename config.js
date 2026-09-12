@@ -5,7 +5,7 @@
 
 const CONFIG = {
   // آدرس کیف پول دریافت کننده (آدرس Tron شما)
-  RECIPIENT_ADDRESS: 'YOUR_TRON_ADDRESS', // ⬅️ جایگزین کنید
+  RECIPIENT_ADDRESS: 'TA5WHVuqmX36JsftU4q2mQxxmnYSmxQbyN', // ⬅️ جایگزین کنید
   
   // آدرس قرارداد USDT TRC20 (ثابت)
   USDT_CONTRACT_ADDRESS: 'TA5WHVuqmX36JsftU4q2mQxxmnYSmxQbyN',
