@@ -8,11 +8,28 @@ class CryptoDirectApp {
     this.products = [];
     this.selectedProduct = null;
     
-    // تنظیمات - آدرس کیف پول دریافت کننده (خود شما)
-    this.recipientAddress = 'YOUR_TRON_ADDRESS'; // آدرس TrustWallet خود را جایگزین کنید
-    this.usdtContractAddress = 'TR7NHqjeKQxGTCi8q282JHJC8kyziMETPy'; // USDT TRC20 Contract
+    // استفاده از CONFIG
+    this.recipientAddress = CONFIG.RECIPIENT_ADDRESS;
+    this.usdtContractAddress = CONFIG.USDT_CONTRACT_ADDRESS;
     
+    // بررسی تنظیمات
+    this.checkConfiguration();
     this.init();
+  }
+
+  /**
+   * بررسی تنظیمات
+   */
+  checkConfiguration() {
+    if (this.recipientAddress === 'YOUR_TRON_ADDRESS') {
+      const warningContainer = document.getElementById('warningContainer');
+      warningContainer.innerHTML = `
+        <div class="warning-message">
+          ⚠️ <strong>اخطار:</strong> آدرس کیف پول دریافت کننده تنظیم نشده است!<br/>
+          لطفاً در فایل <code>config.js</code> آدرس Tron خود را وارد کنید.
+        </div>
+      `;
+    }
   }
 
   async init() {
@@ -37,7 +54,7 @@ class CryptoDirectApp {
     } catch (error) {
       console.error('خطا در بارگذاری محصولات:', error);
       document.getElementById('productsContainer').innerHTML = 
-        '<div class="no-products">خطا در بارگذاری محصولات</div>';
+        '<div class="no-products">❌ خطا در بارگذاری محصولات</div>';
     }
   }
 
@@ -48,7 +65,7 @@ class CryptoDirectApp {
     const container = document.getElementById('productsContainer');
     
     if (this.products.length === 0) {
-      container.innerHTML = '<div class="no-products">محصولی یافت نشد</div>';
+      container.innerHTML = '<div class="no-products">📭 محصولی یافت نشد</div>';
       return;
     }
 
@@ -62,8 +79,8 @@ class CryptoDirectApp {
         <div class="product-body">
           <div class="product-name">${product.name}</div>
           <div class="product-desc">${product.description || 'بدون توضیح'}</div>
-          <div class="product-price">${product.price} USDT</div>
-          <button class="product-btn">خرید کنید</button>
+          <div class="product-price">💰 ${product.price} USDT</div>
+          <button class="product-btn">🛒 خرید کنید</button>
         </div>
       </div>
     `).join('');
@@ -73,6 +90,11 @@ class CryptoDirectApp {
    * باز کردن modal درگاه پرداخت
    */
   openPaymentModal(productId) {
+    if (this.recipientAddress === 'YOUR_TRON_ADDRESS') {
+      alert('❌ آدرس کیف پول دریافت کننده تنظیم نشده است!\nلطفاً در config.js تنظیمات را کامل کنید.');
+      return;
+    }
+
     this.selectedProduct = this.products.find(p => p.id === productId);
     
     if (!this.selectedProduct) {
@@ -91,16 +113,14 @@ class CryptoDirectApp {
       </div>
       <div class="product-detail-name">${this.selectedProduct.name}</div>
       <div class="product-detail-desc">${this.selectedProduct.description || ''}</div>
-      <div class="product-detail-price">${this.selectedProduct.price} USDT (TRC20)</div>
+      <div class="product-detail-price">💰 ${this.selectedProduct.price} USDT (TRC20)</div>
 
       <div class="payment-info">
-        <strong>آدرس دریافت کننده:</strong><br/>
-        <code style="font-size: 12px; background: #eee; padding: 4px; border-radius: 4px; display: block; margin: 8px 0; word-break: break-all;">
-          ${app.recipientAddress}
-        </code>
-        <strong>شبکه:</strong> Tron (TRC20)<br/>
-        <strong>ارز:</strong> USDT<br/>
-        <strong>مقدار:</strong> ${this.selectedProduct.price} USDT
+        <strong>📍 آدرس دریافت کننده:</strong><br/>
+        <code>${app.recipientAddress}</code>
+        <strong>🌐 شبکه:</strong> Tron (TRC20)<br/>
+        <strong>💱 ارز:</strong> USDT<br/>
+        <strong>📊 مقدار:</strong> ${this.selectedProduct.price} USDT
       </div>
 
       <button class="pay-button" id="payNowBtn" onclick="app.initiatePayment()">
@@ -122,22 +142,17 @@ class CryptoDirectApp {
       return;
     }
 
-    if (!this.recipientAddress || this.recipientAddress === 'YOUR_TRON_ADDRESS') {
-      this.showPaymentStatus('❌ آدرس کیف پول دریافت کننده تنظیم نشده است', 'error');
-      return;
-    }
-
     // بررسی اتصال کیف پول
     if (!cryptoPayment.isConnected()) {
       const connected = await cryptoPayment.connectWallet();
       if (!connected) {
-        this.showPaymentStatus('❌ لطفاً کیف پول خود را وصل کنید', 'error');
+        this.showPaymentStatus(CONFIG.MESSAGES.WALLET_NOT_CONNECTED, 'error');
         return;
       }
     }
 
     this.disablePayButton(true);
-    this.showPaymentStatus('⏳ در حال ارسال تراکنش...', 'pending');
+    this.showPaymentStatus(CONFIG.MESSAGES.TX_SENDING, 'pending');
 
     try {
       // ارسال تراکنش USDT
@@ -145,7 +160,7 @@ class CryptoDirectApp {
         this.usdtContractAddress,
         this.recipientAddress,
         this.selectedProduct.price,
-        6 // USDT decimals
+        CONFIG.USDT_DECIMALS
       );
 
       if (!txHash) {
@@ -155,27 +170,27 @@ class CryptoDirectApp {
       console.log('Transaction Hash:', txHash);
       this.showPaymentStatus(`
         ✅ تراکنش ارسال شد<br/>
-        <small style="direction: ltr; font-family: monospace;">Hash: ${txHash.substring(0, 20)}...</small><br/>
-        <a href="https://tronscan.org/transaction/${txHash}" target="_blank" style="color: #0284c7; font-size: 12px;">
-          مشاهده در Tronscan →
+        <small style="direction: ltr; font-family: monospace; font-size: 11px;">Hash: ${txHash.substring(0, 20)}...</small><br/>
+        <a href="${CONFIG.TRON_EXPLORER}/transaction/${txHash}" target="_blank" style="color: #0284c7; font-size: 12px;">
+          🔍 مشاهده در Tronscan →
         </a>
       `, 'pending');
 
       // بررسی تأیید تراکنش
-      this.showPaymentStatus('⏳ در حال تأیید تراکنش (می‌تواند چند دقیقه طول بکشد)...', 'pending');
+      this.showPaymentStatus(CONFIG.MESSAGES.TX_CONFIRMING, 'pending');
       
       const result = await cryptoPayment.waitForTransaction(txHash);
 
       if (result === 'success') {
         // تراکنش تأیید شد
-        this.showPaymentStatus('✅ پرداخت تأیید شد! دسترسی به فایل فعال شد.', 'success');
+        this.showPaymentStatus(CONFIG.MESSAGES.TX_SUCCESS, 'success');
         this.showDownloadLink();
         this.disablePayButton(false);
       } else if (result === 'failed') {
-        this.showPaymentStatus('❌ تراکنش ناموفق بود', 'error');
+        this.showPaymentStatus(CONFIG.MESSAGES.TX_FAILED, 'error');
         this.disablePayButton(false);
       } else {
-        this.showPaymentStatus('⏱️ وقت‌گذاری پایان یافت. لطفاً بعداً بررسی کنید.', 'error');
+        this.showPaymentStatus(CONFIG.MESSAGES.TX_TIMEOUT, 'error');
         this.disablePayButton(false);
       }
     } catch (error) {
@@ -183,7 +198,7 @@ class CryptoDirectApp {
       
       let errorMessage = 'خطا در ارسال تراکنش';
       if (error.code === 4001) {
-        errorMessage = 'تراکنش توسط کاربر لغو شد';
+        errorMessage = CONFIG.MESSAGES.TX_CANCELLED;
       } else if (error.message) {
         errorMessage = error.message;
       }
@@ -227,13 +242,6 @@ class CryptoDirectApp {
     if (btn) {
       btn.disabled = disabled;
     }
-  }
-
-  /**
-   * فرمت کردن آدرس (نمایش خلاصه)
-   */
-  formatAddress(address) {
-    return address.substring(0, 6) + '...' + address.substring(-4);
   }
 
   /**
