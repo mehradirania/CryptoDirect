@@ -5,10 +5,10 @@
 
 const CONFIG = {
   // آدرس کیف پول دریافت کننده (آدرس Tron شما)
-  RECIPIENT_ADDRESS: 'TA5WHVuqmX36JsftU4q2mQxxmnYSmxQbyN', // ⬅️ جایگزین کنید
+  RECIPIENT_ADDRESS: 'TA5WHVuqmX36JsftU4q2mQxxmnYSmxQbyN', // ✅ آدرس شما
   
   // آدرس قرارداد USDT TRC20 (ثابت)
-  USDT_CONTRACT_ADDRESS: 'TA5WHVuqmX36JsftU4q2mQxxmnYSmxQbyN',
+  USDT_CONTRACT_ADDRESS: 'TR7NHqjeKQxGTCi8q282JHJC8kyWyU9g7K', // ✅ آدرس قرارداد USDT رسمی
   
   // Decimals برای USDT
   USDT_DECIMALS: 6,
