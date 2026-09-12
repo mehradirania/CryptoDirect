@@ -1,44 +1,43 @@
 /**
  * CryptoDirect Configuration
- * تنظیمات سایت
  */
 
 const CONFIG = {
-  // آدرس کیف پول دریافت کننده (آدرس Tron شما)
-  RECIPIENT_ADDRESS: 'TA5WHVuqmX36JsftU4q2mQxxmnYSmxQbyN', // ✅ آدرس شما
+  // Recipient wallet address (Your Tron address)
+  RECIPIENT_ADDRESS: 'TA5WHVuqmX36JsftU4q2mQxxmnYSmxQbyN', // ✅ Your address
   
-  // آدرس قرارداد USDT TRC20 (ثابت)
-  USDT_CONTRACT_ADDRESS: 'TR7NHqjeKQxGTCi8q282JHJC8kyWyU9g7K', // ✅ آدرس قرارداد USDT رسمی
+  // USDT TRC20 contract address (fixed)
+  USDT_CONTRACT_ADDRESS: 'TR7NHqjeKQxGTCi8q282JHJC8kyWyU9g7K', // ✅ Official USDT contract address
   
-  // Decimals برای USDT
+  // Decimals for USDT
   USDT_DECIMALS: 6,
   
-  // تنظیمات شبکه Tron
+  // Tron network settings
   TRON_CHAIN_ID: '0x2b6653dc', // Mainnet
   TRON_RPC_URL: 'https://api.tronstack.io/jsonrpc',
   TRON_EXPLORER: 'https://tronscan.org',
   
-  // تنظیمات timeout (میلی‌ثانیه)
-  TX_CONFIRMATION_TIMEOUT: 120000, // 2 دقیقه
-  TX_CHECK_INTERVAL: 3000, // 3 ثانیه
+  // Timeout settings (milliseconds)
+  TX_CONFIRMATION_TIMEOUT: 120000, // 2 minutes
+  TX_CHECK_INTERVAL: 3000, // 3 seconds
   
-  // متن و پیام
+  // Messages and text
   MESSAGES: {
-    WALLET_CONNECTED: 'کیف پول متصل شد',
-    WALLET_DISCONNECTED: 'کیف پول قطع شد',
-    TX_SENDING: '⏳ در حال ارسال تراکنش...',
-    TX_CONFIRMING: '⏳ در حال تأیید تراکنش (می‌تواند چند دقیقه طول بکشد)...',
-    TX_SUCCESS: '✅ پرداخت تأیید شد! دسترسی به فایل فعال شد.',
-    TX_FAILED: '❌ تراکنش ناموفق بود',
-    TX_TIMEOUT: '⏱️ وقت‌گذاری پایان یافت. لطفاً بعداً بررسی کنید.',
-    TX_CANCELLED: 'تراکنش توسط کاربر لغو شد',
-    WALLET_NOT_CONNECTED: '❌ لطفاً کیف پول خود را وصل کنید',
-    INVALID_ADDRESS: '❌ آدرس کیف پول دریافت کننده تنظیم نشده است',
-    NO_PROVIDER: 'لطفاً TrustWallet یا MetaMask را نصب کنید',
+    WALLET_CONNECTED: 'Wallet connected',
+    WALLET_DISCONNECTED: 'Wallet disconnected',
+    TX_SENDING: '⏳ Sending transaction...',
+    TX_CONFIRMING: '⏳ Confirming transaction (may take a few minutes)...',
+    TX_SUCCESS: '✅ Payment confirmed! File access enabled.',
+    TX_FAILED: '❌ Transaction failed',
+    TX_TIMEOUT: '⏱️ Timeout. Please check back later.',
+    TX_CANCELLED: 'Transaction cancelled by user',
+    WALLET_NOT_CONNECTED: '❌ Please connect your wallet',
+    INVALID_ADDRESS: '❌ Recipient wallet address not configured',
+    NO_PROVIDER: 'Please install TrustWallet or MetaMask',
   }
 };
 
-// فرض کنید app.js فایل را بعد از این بارگذاری می‌کند
-// سپس می‌توانید از CONFIG استفاده کنید:
+// Assume app.js loads this file after
+// Then you can use CONFIG:
 // app.recipientAddress = CONFIG.RECIPIENT_ADDRESS;
 // app.usdtContractAddress = CONFIG.USDT_CONTRACT_ADDRESS;
