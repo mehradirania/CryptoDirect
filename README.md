@@ -1,40 +1,40 @@
 # CryptoDirect
 
-یک فروشگاه کریپتو ساده و امن برای فروش محصولات دیجیتالی با پرداخت **USDT TRC20**.
+A simple and secure crypto store for selling digital products with **USDT TRC20** payments.
 
-## 🎯 ویژگی‌ها
+## 🎯 Features
 
-- ✅ درگاه پرداخت واقعی USDT TRC20
-- ✅ اتصال مستقیم به TrustWallet یا MetaMask
-- ✅ تأیید خودکار تراکنش
-- ✅ دانلود خودکار فایل بعد از پرداخت
-- ✅ طراحی ریسپانسیو و مدرن
-- ✅ رابط فارسی
+- ✅ Real USDT TRC20 payment gateway
+- ✅ Direct connection to TrustWallet or MetaMask
+- ✅ Automatic transaction verification
+- ✅ Automatic file download after payment
+- ✅ Responsive and modern design
+- ✅ English language interface
 
-## 🚀 شروع سریع
+## 🚀 Quick Start
 
-### 1️⃣ تنظیم آدرس کیف پول
+### 1️⃣ Configure Wallet Address
 
-باز کنید: `config.js`
+Open: `config.js`
 
 ```javascript
-RECIPIENT_ADDRESS: 'YOUR_TRON_ADDRESS', // آدرس Tron خود را وارد کنید
+RECIPIENT_ADDRESS: 'YOUR_TRON_ADDRESS', // Enter your Tron address
 ```
 
-**نحوه پیدا کردن آدرس Tron:**
-1. TrustWallet را باز کنید
-2. روی Tron Network کلیک کنید
-3. آدرس را کپی کنید (شروع می‌شود با `T`)
+**How to find your Tron address:**
+1. Open TrustWallet
+2. Click on Tron Network
+3. Copy your address (starts with `T`)
 
-### 2️⃣ اضافه کردن محصولات
+### 2️⃣ Add Products
 
-باز کنید: `products.json`
+Open: `products.json`
 
 ```json
 {
   "PRODUCT_ID": {
-    "name": "نام محصول",
-    "description": "توضیح محصول",
+    "name": "Product Name",
+    "description": "Product description",
     "price": 299,
     "image": "assets/product.jpg",
     "file": "https://link-to-download",
@@ -43,9 +43,9 @@ RECIPIENT_ADDRESS: 'YOUR_TRON_ADDRESS', // آدرس Tron خود را وارد ک
 }
 ```
 
-### 3️⃣ راه‌اندازی سایت
+### 3️⃣ Deploy Website
 
-سایت به صورت خودکار از GitHub Pages کار می‌کند. فقط push کنید:
+The website automatically works via GitHub Pages. Just push your changes:
 
 ```bash
 git add .
@@ -53,53 +53,53 @@ git commit -m "Update products"
 git push origin main
 ```
 
-سایت شما در دسترس است: `https://mehradirania.github.io/CryptoDirect/`
+Your site is available at: `https://mehradirania.github.io/CryptoDirect/`
 
 ---
 
-## 📁 ساختار پروژه
+## 📁 Project Structure
 
 ```
 CryptoDirect/
-├── index.html           # صفحه اصلی
-├── config.js           # تنظیمات
-├── products.json       # لیست محصولات
+├── index.html           # Main page
+├── config.js           # Settings
+├── products.json       # Product list
 ├── scripts/
-│   ├── app.js         # منطق اصلی فروشگاه
-│   └── payment.js     # درگاه پرداخت USDT
+│   ├── app.js         # Main store logic
+│   └── payment.js     # USDT payment gateway
 ├── assets/
-│   └── images/        # تصاویر محصولات
-└── README.md          # این فایل
+│   └── images/        # Product images
+└── README.md          # This file
 ```
 
 ---
 
-## 💳 نحوه کار
+## 💳 How It Works
 
-1. **مشاهده محصولات**: کاربر محصولات را در صفحه اصلی می‌بیند
-2. **انتخاب محصول**: روی محصول کلیک می‌کند
-3. **اتصال کیف پول**: TrustWallet یا MetaMask را متصل می‌کند
-4. **پرداخت**: روی دکمه "پرداخت" کلیک می‌کند
-5. **تأیید تراکنش**: سیستم منتظر تأیید تراکنش در شبکه است
-6. **دانلود**: بعد از تأیید، لینک دانلود فعال می‌شود
-
----
-
-## 🔐 امنیت
-
-- ❌ **بدون سرور مرکزی** - همه چیز در مرورگر کاربر انجام می‌شود
-- ❌ **بدون ذخیره کلید پرایوت** - کیف پول کاملاً کنترل کاربر است
-- ✅ **تراکنش بر روی بلاک‌چین** - همه تراکنش‌ها قابل تأیید هستند
+1. **View Products**: User sees products on the main page
+2. **Select Product**: User clicks on a product
+3. **Connect Wallet**: User connects TrustWallet or MetaMask
+4. **Pay**: User clicks the "Pay" button
+5. **Verify Transaction**: System waits for transaction confirmation
+6. **Download**: After confirmation, download link becomes available
 
 ---
 
-## 📝 مثال محصول
+## 🔐 Security
+
+- ❌ **No central server** - Everything runs in user's browser
+- ❌ **No private key storage** - Wallet is fully user controlled
+- ✅ **Transactions on blockchain** - All transactions are verifiable
+
+---
+
+## 📝 Product Example
 
 ```json
 {
   "A7kD9sBfP2LmQxT4V": {
     "name": "PST Trend Indicator",
-    "description": "بهترین اندیکاتور تشخیص روند جهان",
+    "description": "The best trend-detection indicator in the world",
     "price": 299,
     "image": "assets/IMG_20260621_174250_857.jpg",
     "file": "https://www.dropbox.com/scl/fo/lccpf7saii8ynchui9r8x/...",
@@ -110,17 +110,17 @@ CryptoDirect/
 
 ---
 
-## 🔗 لینک‌های مفید
+## 🔗 Useful Links
 
-- [Tronscan - بررسی تراکنش‌ها](https://tronscan.org)
-- [TrustWallet - دانلود](https://trustwallet.com)
+- [Tronscan - Check Transactions](https://tronscan.org)
+- [TrustWallet - Download](https://trustwallet.com)
 - [USDT TRC20 Contract](https://tronscan.org/address/TR7NHqjeKQxGTCi8q282JHJC8kyziMETPy)
 
 ---
 
-## ⚙️ تنظیمات پیشرفته
+## ⚙️ Advanced Settings
 
-اگر می‌خواهید شبکه Testnet استفاده کنید، `config.js` را ویرایش کنید:
+If you want to use Testnet, edit `config.js`:
 
 ```javascript
 TRON_CHAIN_ID: '0xcd8690dc', // Testnet
@@ -129,12 +129,12 @@ TRON_RPC_URL: 'https://api.shasta.trongrid.io/jsonrpc',
 
 ---
 
-## 📞 پشتیبانی
+## 📞 Support
 
-برای سوالات و مشکلات:
-- 🌐 وب‌سایت: [mehradirania.github.io](https://github.com/mehradirania)
-- 📧 ایمیل: mehradirania@gmail.com
+For questions and issues:
+- 🌐 Website: [mehradirania.github.io](https://github.com/mehradirania)
+- 📧 Email: mehradirania@gmail.com
 
 ---
 
-**ساخته شده توسط Mehrad Irani** 🪙
+**Built by Mehrad Irani** 🪙
