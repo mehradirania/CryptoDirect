@@ -121,6 +121,7 @@
       align-items: center;
       justify-content: center;
       overflow: hidden;
+      font-size: 48px;
     }
 
     .product-image img {
@@ -257,6 +258,7 @@
       justify-content: center;
       overflow: hidden;
       margin-bottom: 16px;
+      font-size: 64px;
     }
 
     .product-detail-image img {
@@ -297,6 +299,17 @@
 
     .payment-info strong {
       color: #222;
+    }
+
+    .payment-info code {
+      font-size: 12px;
+      background: #eee;
+      padding: 4px;
+      border-radius: 4px;
+      display: block;
+      margin: 8px 0;
+      word-break: break-all;
+      font-family: monospace;
     }
 
     .pay-button {
@@ -365,6 +378,18 @@
     .download-box a:hover {
       text-decoration: underline;
     }
+
+    .warning-message {
+      background: #fef3c7;
+      border: 1px solid #fcd34d;
+      padding: 16px;
+      border-radius: 8px;
+      margin: 20px auto;
+      max-width: 1200px;
+      color: #92400e;
+      text-align: center;
+      font-size: 13px;
+    }
   </style>
 </head>
 <body>
@@ -381,6 +406,8 @@
     <button class="connect-wallet-btn" id="connectWalletBtn">اتصال کیف پول</button>
   </div>
 
+  <div id="warningContainer"></div>
+
   <div class="products-container" id="productsContainer">
     <div class="loading">در حال بارگذاری محصولات...</div>
   </div>
@@ -396,6 +423,7 @@
     </div>
   </div>
 
+  <script src="config.js"></script>
   <script src="scripts/payment.js"></script>
   <script src="scripts/app.js"></script>
 </body>
