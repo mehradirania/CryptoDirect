@@ -4,7 +4,7 @@ class CryptoPayment {
     this.walletAddress = null;
     this.tronWeb = null;
     this.walletName = null;
-    this.adapter = null;
+    this.walletConnect = null;
     this.init();
   }
 
@@ -25,12 +25,12 @@ class CryptoPayment {
         }
       }
     } catch (error) {
-      console.error(error);
+      console.error("Wallet check error:", error);
     }
   }
 
   async connectWallet() {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       this.showWalletSelector(resolve);
     });
   }
@@ -69,7 +69,7 @@ class CryptoPayment {
             align-items:center;
             margin-bottom:20px;
           ">
-            <strong style="font-size:21px;">
+            <strong style="font-size:21px">
               Connect Wallet
             </strong>
 
@@ -82,15 +82,15 @@ class CryptoPayment {
           </div>
 
           <button id="walletTronLink" class="wallet-option">
-            🔴 <span>TronLink</span>
+            🔴 TronLink
           </button>
 
           <button id="walletTrust" class="wallet-option">
-            🔵 <span>Trust Wallet</span>
+            🔵 Trust Wallet
           </button>
 
           <button id="walletMore" class="wallet-option">
-            ➕ <span>More Wallets</span>
+            ➕ More Wallets
           </button>
 
           <div id="walletStatus" style="
@@ -99,7 +99,6 @@ class CryptoPayment {
             color:#666;
             font-size:13px;
           "></div>
-
         </div>
       </div>
     `;
@@ -107,13 +106,10 @@ class CryptoPayment {
     document.body.appendChild(overlay);
 
     const style = document.createElement("style");
-
     style.textContent = `
       .wallet-option {
         width:100%;
-        display:flex;
-        align-items:center;
-        gap:12px;
+        display:block;
         padding:16px;
         margin-bottom:10px;
         border:1px solid #ddd;
@@ -150,57 +146,54 @@ class CryptoPayment {
 
     document.getElementById("walletTrust").onclick =
       async () => {
-        await this.connectTrustWallet();
+        const result = await this.connectWalletConnect();
+
+        if (result) {
+          overlay.remove();
+          resolve(true);
+        }
       };
 
     document.getElementById("walletMore").onclick =
       async () => {
-        await this.connectMoreWallets();
+        const result = await this.connectWalletConnect();
+
+        if (result) {
+          overlay.remove();
+          resolve(true);
+        }
       };
   }
 
   async connectTronLink() {
     try {
-      if (!window.tronLink && !window.tron) {
+      if (!window.tronLink) {
         this.openTronLink();
         return false;
       }
 
-      if (window.tron) {
-        try {
-          await window.tron.request({
-            method: "eth_requestAccounts"
-          });
-        } catch (e) {
-          await window.tronLink?.request({
-            method: "tron_requestAccounts"
-          });
-        }
-      } else {
-        await window.tronLink.request({
-          method: "tron_requestAccounts"
-        });
+      const result = await window.tronLink.request({
+        method: "tron_requestAccounts"
+      });
+
+      if (result && result.code !== 200) {
+        throw new Error("Connection rejected");
       }
 
       await new Promise(r => setTimeout(r, 700));
 
-      const tronWeb =
-        window.tron?.tronWeb ||
-        window.tronWeb;
-
-      if (!tronWeb?.ready) {
+      if (!window.tronWeb?.ready) {
         throw new Error("TronLink is not ready");
       }
 
-      const address =
-        tronWeb.defaultAddress?.base58;
+      this.tronWeb = window.tronWeb;
+      this.walletAddress =
+        this.tronWeb.defaultAddress?.base58;
 
-      if (!address) {
+      if (!this.walletAddress) {
         throw new Error("Wallet address unavailable");
       }
 
-      this.tronWeb = tronWeb;
-      this.walletAddress = address;
       this.walletName = "TronLink";
       this.connected = true;
 
@@ -210,72 +203,63 @@ class CryptoPayment {
 
     } catch (error) {
       console.error("TronLink error:", error);
-
-      this.showWalletStatus(
-        "اتصال به TronLink انجام نشد."
-      );
-
+      this.showWalletStatus("اتصال به TronLink انجام نشد.");
       return false;
     }
   }
 
-  async connectTrustWallet() {
+  async connectWalletConnect() {
     try {
-      const status =
-        document.getElementById("walletStatus");
+      const WalletConnectAdapter =
+        window["@tronweb3/tronwallet-adapters"]
+          ?.WalletConnectAdapter;
 
-      if (status) {
-        status.textContent =
-          "در حال باز کردن Trust Wallet...";
-      }
-
-      const currentUrl =
-        window.location.href;
-
-      const trustUrl =
-        "https://link.trustwallet.com/open_url?url=" +
-        encodeURIComponent(currentUrl);
-
-      window.location.href = trustUrl;
-
-    } catch (error) {
-      console.error(
-        "Trust Wallet error:",
-        error
-      );
-
-      this.showWalletStatus(
-        "اتصال به Trust Wallet انجام نشد."
-      );
-    }
-  }
-
-  async connectMoreWallets() {
-    this.showWalletStatus(
-      "در حال بررسی کیف پول‌های سازگار..."
-    );
-
-    try {
-      if (
-        window.TronWalletAdapter &&
-        typeof window.TronWalletAdapter === "object"
-      ) {
-        this.showWalletStatus(
-          "کیف پول‌های بیشتر در حال آماده‌سازی هستند."
+      if (!WalletConnectAdapter) {
+        throw new Error(
+          "WalletConnect adapter is not loaded"
         );
-        return;
       }
 
-      this.showWalletStatus(
-        "برای کیف پول‌های بیشتر باید WalletConnect فعال شود."
-      );
+      const adapter = new WalletConnectAdapter({
+        network: "Mainnet",
+        options: {
+          relayUrl: "wss://relay.walletconnect.com",
+          projectId: "db7319890f24e95d014692e0a729aac9",
+          metadata: {
+            name: "CryptoDirect",
+            description: "CryptoDirect TRON Payment",
+            url: window.location.origin,
+            icons: []
+          }
+        }
+      });
+
+      this.walletConnect = adapter;
+
+      await adapter.connect();
+
+      const address = adapter.address;
+
+      if (!address) {
+        throw new Error("Wallet address unavailable");
+      }
+
+      this.walletAddress = address;
+      this.walletName = "WalletConnect";
+      this.connected = true;
+
+      this.updateWalletUI();
+
+      return true;
 
     } catch (error) {
-      console.error(error);
+      console.error("WalletConnect error:", error);
 
       this.showWalletStatus(
-        "امکان اتصال کیف پول بیشتر وجود ندارد."
+        "اتصال کیف پول انجام نشد. دوباره تلاش کنید."
       );
+
+      return false;
     }
   }
 
@@ -291,17 +275,22 @@ class CryptoPayment {
   openTronLink() {
     const url = window.location.href;
 
-    const deepLink =
+    window.location.href =
       "tronlinkoutside://call?url=" +
       encodeURIComponent(url);
-
-    window.location.href = deepLink;
   }
 
   disconnectWallet() {
+    try {
+      this.walletConnect?.disconnect?.();
+    } catch (e) {
+      console.error(e);
+    }
+
     this.connected = false;
     this.walletAddress = null;
     this.tronWeb = null;
+    this.walletConnect = null;
     this.walletName = null;
 
     this.updateWalletUI();
@@ -330,17 +319,13 @@ class CryptoPayment {
         );
 
       text.textContent =
-        `${this.walletName || "Wallet"}: ${short}`;
+        `${this.walletName}: ${short}`;
 
       button.textContent = "Disconnect";
     } else {
       dot?.classList.add("disconnected");
-
-      text.textContent =
-        "Wallet not connected";
-
-      button.textContent =
-        "Connect Wallet";
+      text.textContent = "Wallet not connected";
+      button.textContent = "Connect Wallet";
     }
   }
 
@@ -350,37 +335,57 @@ class CryptoPayment {
     amount,
     decimals = 6
   ) {
-    if (
-      !this.connected ||
-      !this.tronWeb ||
-      !this.walletAddress
-    ) {
-      throw new Error(
-        "Wallet is not connected"
+    if (!this.connected || !this.walletAddress) {
+      throw new Error("Wallet is not connected");
+    }
+
+    if (this.walletConnect) {
+      const amountInSmallestUnit =
+        BigInt(
+          Math.round(
+            Number(amount) * 10 ** decimals
+          )
+        ).toString();
+
+      const transaction =
+        await this.tronWeb.transactionBuilder.triggerSmartContract(
+          usdtContractAddress,
+          "transfer(address,uint256)",
+          {
+            feeLimit: 100_000_000,
+            callValue: 0
+          },
+          [
+            {
+              type: "address",
+              value: toAddress
+            },
+            {
+              type: "uint256",
+              value: amountInSmallestUnit
+            }
+          ],
+          this.walletAddress
+        );
+
+      const signed =
+        await this.walletConnect.signTransaction(
+          transaction.transaction
+        );
+
+      return await this.tronWeb.trx.sendRawTransaction(
+        signed
       );
     }
 
-    if (!this.tronWeb.isAddress(toAddress)) {
-      throw new Error(
-        "Invalid recipient address"
-      );
-    }
-
-    if (
-      !this.tronWeb.isAddress(
-        usdtContractAddress
-      )
-    ) {
-      throw new Error(
-        "Invalid USDT contract address"
-      );
+    if (!this.tronWeb) {
+      throw new Error("TRON provider unavailable");
     }
 
     const amountInSmallestUnit =
       BigInt(
         Math.round(
-          Number(amount) *
-          10 ** decimals
+          Number(amount) * 10 ** decimals
         )
       );
 
@@ -389,17 +394,14 @@ class CryptoPayment {
         .contract()
         .at(usdtContractAddress);
 
-    const tx =
-      await contract
-        .transfer(
-          toAddress,
-          amountInSmallestUnit.toString()
-        )
-        .send({
-          feeLimit: 100_000_000
-        });
-
-    return tx;
+    return await contract
+      .transfer(
+        toAddress,
+        amountInSmallestUnit.toString()
+      )
+      .send({
+        feeLimit: 100_000_000
+      });
   }
 
   async waitForTransaction(
@@ -408,9 +410,7 @@ class CryptoPayment {
   ) {
     const startTime = Date.now();
 
-    while (
-      Date.now() - startTime < timeout
-    ) {
+    while (Date.now() - startTime < timeout) {
       try {
         const info =
           await this.tronWeb
@@ -422,8 +422,7 @@ class CryptoPayment {
           info.id === txHash &&
           info.receipt
         ) {
-          return info.receipt.result ===
-            "SUCCESS"
+          return info.receipt.result === "SUCCESS"
             ? "success"
             : "failed";
         }
@@ -451,5 +450,4 @@ class CryptoPayment {
   }
 }
 
-const cryptoPayment =
-  new CryptoPayment();
+const cryptoPayment = new CryptoPayment();
