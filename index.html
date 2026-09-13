@@ -4,19 +4,19 @@
   <meta charset="UTF-8">
   <title>CryptoDirect – Crypto Store</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <style>
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
-    
+
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       min-height: 100vh;
       padding: 20px;
-      direction: ltr;
     }
 
     .header {
@@ -39,8 +39,8 @@
     .wallet-status {
       max-width: 1200px;
       margin: 0 auto 20px;
-      background: rgba(255, 255, 255, 0.1);
-      border: 1px solid rgba(255, 255, 255, 0.3);
+      background: rgba(255,255,255,.1);
+      border: 1px solid rgba(255,255,255,.3);
       padding: 12px 20px;
       border-radius: 8px;
       color: white;
@@ -48,7 +48,6 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      flex-wrap: wrap;
       gap: 15px;
     }
 
@@ -78,17 +77,6 @@
       cursor: pointer;
       font-size: 12px;
       font-weight: 600;
-      transition: all 0.3s;
-    }
-
-    .connect-wallet-btn:hover {
-      background: #2563eb;
-      transform: translateY(-1px);
-    }
-
-    .connect-wallet-btn:disabled {
-      background: #999;
-      cursor: default;
     }
 
     .products-container {
@@ -103,14 +91,13 @@
       background: white;
       border-radius: 12px;
       overflow: hidden;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-      transition: all 0.3s;
+      box-shadow: 0 10px 30px rgba(0,0,0,.2);
+      transition: .3s;
       cursor: pointer;
     }
 
     .product-card:hover {
       transform: translateY(-8px);
-      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
     }
 
     .product-image {
@@ -132,7 +119,6 @@
 
     .product-body {
       padding: 20px;
-      text-align: left;
     }
 
     .product-name {
@@ -147,10 +133,6 @@
       color: #666;
       line-height: 1.5;
       margin-bottom: 12px;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
     }
 
     .product-price {
@@ -160,47 +142,30 @@
       margin-bottom: 12px;
     }
 
-    .product-btn {
+    .product-btn,
+    .pay-button {
       width: 100%;
       padding: 12px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg,#667eea 0%,#764ba2 100%);
       color: white;
       border: none;
       border-radius: 8px;
       cursor: pointer;
-      font-size: 14px;
       font-weight: 600;
-      transition: all 0.3s;
     }
 
-    .product-btn:hover {
-      transform: scale(1.02);
-      opacity: 0.9;
-    }
-
-    .loading {
-      text-align: center;
-      color: white;
-      font-size: 16px;
-      padding: 40px;
-    }
-
+    .loading,
     .no-products {
       text-align: center;
       color: white;
-      font-size: 18px;
-      padding: 60px 20px;
+      padding: 40px;
     }
 
-    /* Modal Styles */
     .modal {
       display: none;
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.7);
+      inset: 0;
+      background: rgba(0,0,0,.7);
       z-index: 1000;
       align-items: center;
       justify-content: center;
@@ -217,7 +182,6 @@
       width: 90%;
       max-height: 90vh;
       overflow-y: auto;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
     }
 
     .modal-header {
@@ -231,8 +195,6 @@
     .modal-title {
       font-size: 18px;
       font-weight: 700;
-      color: #222;
-      text-align: left;
     }
 
     .modal-close {
@@ -245,7 +207,6 @@
 
     .modal-body {
       padding: 24px;
-      text-align: left;
     }
 
     .product-detail-image {
@@ -258,7 +219,6 @@
       justify-content: center;
       overflow: hidden;
       margin-bottom: 16px;
-      font-size: 64px;
     }
 
     .product-detail-image img {
@@ -271,11 +231,9 @@
       font-size: 20px;
       font-weight: 700;
       margin-bottom: 8px;
-      color: #222;
     }
 
     .product-detail-desc {
-      font-size: 14px;
       color: #666;
       line-height: 1.6;
       margin-bottom: 16px;
@@ -302,44 +260,17 @@
     }
 
     .payment-info code {
-      font-size: 12px;
-      background: #eee;
-      padding: 4px;
-      border-radius: 4px;
       display: block;
       margin: 8px 0;
+      padding: 4px;
+      background: #eee;
       word-break: break-all;
-      font-family: monospace;
-    }
-
-    .pay-button {
-      width: 100%;
-      padding: 14px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 16px;
-      font-weight: 600;
-      transition: all 0.3s;
-    }
-
-    .pay-button:hover {
-      opacity: 0.9;
-      transform: translateY(-1px);
-    }
-
-    .pay-button:disabled {
-      background: #ccc;
-      cursor: default;
     }
 
     .status-message {
       margin-top: 16px;
       padding: 12px;
       border-radius: 8px;
-      font-size: 14px;
       text-align: center;
       font-weight: 600;
     }
@@ -372,11 +303,6 @@
       color: #0284c7;
       text-decoration: none;
       font-weight: 600;
-      word-break: break-all;
-    }
-
-    .download-box a:hover {
-      text-decoration: underline;
     }
 
     .warning-message {
@@ -388,22 +314,26 @@
       max-width: 1200px;
       color: #92400e;
       text-align: center;
-      font-size: 13px;
     }
   </style>
 </head>
+
 <body>
+
   <div class="header">
     <h1>🪙 CryptoDirect</h1>
     <p>Crypto Payment Store - Pay with USDT TRC20</p>
   </div>
 
-  <div class="wallet-status" id="walletStatus">
+  <div class="wallet-status">
     <div class="wallet-info">
       <span class="wallet-dot disconnected" id="walletDot"></span>
       <span id="walletText">Wallet not connected</span>
     </div>
-    <button class="connect-wallet-btn" id="connectWalletBtn">Connect Wallet</button>
+
+    <button class="connect-wallet-btn" id="connectWalletBtn">
+      Connect Wallet
+    </button>
   </div>
 
   <div id="warningContainer"></div>
@@ -412,35 +342,24 @@
     <div class="loading">Loading products...</div>
   </div>
 
-  <!-- Payment Modal -->
   <div class="modal" id="paymentModal">
+
     <div class="modal-content">
+
       <div class="modal-header">
+        <div class="modal-title">Product Details</div>
         <button class="modal-close" id="closeModal">&times;</button>
-        <div class="modal-title" id="modalTitle">Product Details</div>
       </div>
+
       <div class="modal-body" id="modalBody"></div>
+
     </div>
+
   </div>
 
   <script src="config.js"></script>
   <script src="scripts/payment.js"></script>
   <script src="scripts/app.js"></script>
+
 </body>
 </html>
-<div class="wallet-box">
-  <h3>USDT TRC20 Payment</h3>
-
-  <p>Amount: <strong id="amountBox"></strong> USDT</p>
-
-  <p>Wallet Address:</p>
-  <div class="wallet-address" id="walletAddress" style="direction:ltr;font-weight:bold;"></div>
-
-  <button class="btn" id="copyWallet">Copy Wallet Address</button>
-
-  <div class="qr-wrapper">
-    <img id="qrImage" src="" alt="QR Code" style="width:200px;height:200px;margin-top:16px;">
-  </div>
-
-  <button class="btn" id="openWallet">Open Wallet App</button>
-</div>
