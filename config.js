@@ -36,7 +36,29 @@ const CONFIG = {
     NO_PROVIDER: 'Please install TrustWallet or MetaMask',
   }
 };
+const wallet = product.wallet;
+const amount = product.price;
 
+// نمایش مقدار
+document.getElementById("amountBox").textContent = amount;
+
+// نمایش آدرس کیف پول
+document.getElementById("walletAddress").textContent = wallet;
+
+// ساخت QR Code
+document.getElementById("qrImage").src =
+  `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=tron:${wallet}?amount=${amount}`;
+
+// دکمه کپی
+document.getElementById("copyWallet").onclick = () => {
+  navigator.clipboard.writeText(wallet);
+  alert("Wallet address copied!");
+};
+
+// دکمه باز کردن کیف پول (TronLink / TokenPocket / OKX / TrustWallet)
+document.getElementById("openWallet").onclick = () => {
+  window.location.href = `tronlink://send?to=${wallet}&amount=${amount}&token=USDT`;
+};
 // Assume app.js loads this file after
 // Then you can use CONFIG:
 // app.recipientAddress = CONFIG.RECIPIENT_ADDRESS;
