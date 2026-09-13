@@ -2,7 +2,7 @@
  * CryptoDirect Configuration
  */
 
-const CONFIG = {
+»const CONFIG = {
   // Recipient wallet address (Your Tron address)
   RECIPIENT_ADDRESS: 'TA5WHVuqmX36JsftU4q2mQxxmnYSmxQbyN', // ✅ Your address
   
@@ -35,9 +35,13 @@ const CONFIG = {
     INVALID_ADDRESS: '❌ Recipient wallet address not configured',
     NO_PROVIDER: 'Please install TrustWallet or MetaMask',
   }
-};
-const wallet = product.wallet;
-const amount = product.price;
+// Assume app.js loads this file after
+// Then you can use CONFIG:
+// app.recipientAddress = CONFIG.RECIPIENT_ADDRESS;
+// app.usdtContractAddress = CONFIG.USDT_CONTRACT_ADDRESS;
+):
+»const wallet = product.wallet;
+»const amount = product.price;
 
 // نمایش مقدار
 document.getElementById("amountBox").textContent = amount;
@@ -59,7 +63,3 @@ document.getElementById("copyWallet").onclick = () => {
 document.getElementById("openWallet").onclick = () => {
   window.location.href = `tronlink://send?to=${wallet}&amount=${amount}&token=USDT`;
 };
-// Assume app.js loads this file after
-// Then you can use CONFIG:
-// app.recipientAddress = CONFIG.RECIPIENT_ADDRESS;
-// app.usdtContractAddress = CONFIG.USDT_CONTRACT_ADDRESS;
