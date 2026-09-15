@@ -7,12 +7,17 @@ class CryptoDirectApp {
   constructor() {
     this.products = [];
     this.selectedProduct = null;
-    
-    // Use CONFIG
+
+    // CONFIG safety
+    if (typeof CONFIG === "undefined") {
+      console.error("CONFIG is not defined. Make sure config.js is loaded before app.js.");
+      alert("❌ CONFIG not loaded. Check config.js include order.");
+      return;
+    }
+
     this.recipientAddress = CONFIG.RECIPIENT_ADDRESS;
     this.usdtContractAddress = CONFIG.USDT_CONTRACT_ADDRESS;
-    
-    // Check configuration
+
     this.checkConfiguration();
     this.init();
   }
@@ -21,14 +26,21 @@ class CryptoDirectApp {
    * Check configuration
    */
   checkConfiguration() {
-    if (this.recipientAddress === 'YOUR_TRON_ADDRESS') {
-      const warningContainer = document.getElementById('warningContainer');
+    const warningContainer = document.getElementById("warningContainer");
+    if (!warningContainer) return;
+
+    if (
+      !this.recipientAddress ||
+      this.recipientAddress === "YOUR_TRON_ADDRESS"
+    ) {
       warningContainer.innerHTML = `
         <div class="warning-message">
           ⚠️ <strong>Warning:</strong> Recipient wallet address not configured!<br/>
           Please enter your Tron address in the <code>config.js</code> file.
         </div>
       `;
+    } else {
+      warningContainer.innerHTML = "";
     }
   }
 
@@ -41,10 +53,18 @@ class CryptoDirectApp {
    * Load products from JSON
    */
   async loadProducts() {
+    const container = document.getElementById("productsContainer");
+    if (!container) return;
+
     try {
-      const response = await fetch('products.json');
+      const response = await fetch("products.json");
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+
       const productsData = await response.json();
-      
+
       this.products = Object.entries(productsData).map(([id, product]) => ({
         id,
         ...product
@@ -52,8 +72,8 @@ class CryptoDirectApp {
 
       this.renderProducts();
     } catch (error) {
-      console.error('Error loading products:', error);
-      document.getElementById('productsContainer').innerHTML = 
+      console.error("Error loading products:", error);
+      container.innerHTML =
         '<div class="no-products">❌ Error loading products</div>';
     }
   }
@@ -62,62 +82,85 @@ class CryptoDirectApp {
    * Render products
    */
   renderProducts() {
-    const container = document.getElementById('productsContainer');
-    
-    if (this.products.length === 0) {
-      container.innerHTML = '<div class="no-products">📭 No products found</div>';
+    const container = document.getElementById("productsContainer");
+    if (!container) return;
+
+    if (!Array.isArray(this.products) || this.products.length === 0) {
+      container.innerHTML =
+        '<div class="no-products">📭 No products found</div>';
       return;
     }
 
-    container.innerHTML = this.products.map(product => `
+    container.innerHTML = this.products
+      .map(
+        product => `
       <div class="product-card" onclick="app.openPaymentModal('${product.id}')">
         <div class="product-image">
-          ${product.image 
-            ? `<img src="${product.image}" alt="${product.name}" onerror="this.style.display='none'">` 
-            : '<span>📦</span>'}
+          ${
+            product.image
+              ? `<img src="${product.image}" alt="${product.name}" onerror="this.style.display='none'">`
+              : "<span>📦</span>"
+          }
         </div>
         <div class="product-body">
           <div class="product-name">${product.name}</div>
-          <div class="product-desc">${product.description || 'No description'}</div>
+          <div class="product-desc">${
+            product.description || "No description"
+          }</div>
           <div class="product-price">💰 ${product.price} USDT</div>
           <button class="product-btn">🛒 Buy Now</button>
         </div>
       </div>
-    `).join('');
+    `
+      )
+      .join("");
   }
 
   /**
    * Open payment modal
    */
   openPaymentModal(productId) {
-    if (this.recipientAddress === 'YOUR_TRON_ADDRESS') {
-      alert('❌ Recipient wallet address not configured!\nPlease complete the settings in config.js.');
+    if (
+      !this.recipientAddress ||
+      this.recipientAddress === "YOUR_TRON_ADDRESS"
+    ) {
+      alert(
+        "❌ Recipient wallet address not configured!\nPlease complete the settings in config.js."
+      );
       return;
     }
 
     this.selectedProduct = this.products.find(p => p.id === productId);
-    
+
     if (!this.selectedProduct) {
-      alert('Product not found');
+      alert("Product not found");
       return;
     }
 
-    const modalBody = document.getElementById('modalBody');
-    const modal = document.getElementById('paymentModal');
+    const modalBody = document.getElementById("modalBody");
+    const modal = document.getElementById("paymentModal");
+
+    if (!modalBody || !modal) return;
 
     modalBody.innerHTML = `
       <div class="product-detail-image">
-        ${this.selectedProduct.image 
-          ? `<img src="${this.selectedProduct.image}" alt="${this.selectedProduct.name}" onerror="this.style.display='none'">` 
-          : '<span>📦</span>'}
+        ${
+          this.selectedProduct.image
+            ? `<img src="${this.selectedProduct.image}" alt="${this.selectedProduct.name}" onerror="this.style.display='none'">`
+            : "<span>📦</span>"
+        }
       </div>
       <div class="product-detail-name">${this.selectedProduct.name}</div>
-      <div class="product-detail-desc">${this.selectedProduct.description || ''}</div>
-      <div class="product-detail-price">💰 ${this.selectedProduct.price} USDT (TRC20)</div>
+      <div class="product-detail-desc">${
+        this.selectedProduct.description || ""
+      }</div>
+      <div class="product-detail-price">💰 ${
+        this.selectedProduct.price
+      } USDT (TRC20)</div>
 
       <div class="payment-info">
         <strong>📍 Recipient Address:</strong><br/>
-        <code>${app.recipientAddress}</code>
+        <code>${this.recipientAddress}</code>
         <strong>🌐 Network:</strong> Tron (TRC20)<br/>
         <strong>💱 Currency:</strong> USDT<br/>
         <strong>📊 Amount:</strong> ${this.selectedProduct.price} USDT
@@ -130,7 +173,7 @@ class CryptoDirectApp {
       <div id="paymentStatus"></div>
     `;
 
-    modal.classList.add('active');
+    modal.classList.add("active");
   }
 
   /**
@@ -138,7 +181,12 @@ class CryptoDirectApp {
    */
   async initiatePayment() {
     if (!this.selectedProduct) {
-      alert('No product selected');
+      alert("No product selected");
+      return;
+    }
+
+    if (typeof cryptoPayment === "undefined") {
+      alert("❌ Payment module not loaded.");
       return;
     }
 
@@ -146,16 +194,18 @@ class CryptoDirectApp {
     if (!cryptoPayment.isConnected()) {
       const connected = await cryptoPayment.connectWallet();
       if (!connected) {
-        this.showPaymentStatus(CONFIG.MESSAGES.WALLET_NOT_CONNECTED, 'error');
+        this.showPaymentStatus(
+          CONFIG.MESSAGES.WALLET_NOT_CONNECTED,
+          "error"
+        );
         return;
       }
     }
 
     this.disablePayButton(true);
-    this.showPaymentStatus(CONFIG.MESSAGES.TX_SENDING, 'pending');
+    this.showPaymentStatus(CONFIG.MESSAGES.TX_SENDING, "pending");
 
     try {
-      // Send USDT transaction
       const txHash = await cryptoPayment.sendUSDT(
         this.usdtContractAddress,
         this.recipientAddress,
@@ -164,46 +214,51 @@ class CryptoDirectApp {
       );
 
       if (!txHash) {
-        throw new Error('Transaction not created');
+        throw new Error("Transaction not created");
       }
 
-      console.log('Transaction Hash:', txHash);
-      this.showPaymentStatus(`
+      console.log("Transaction Hash:", txHash);
+
+      this.showPaymentStatus(
+        `
         ✅ Transaction sent<br/>
-        <small style="direction: ltr; font-family: monospace; font-size: 11px;">Hash: ${txHash.substring(0, 20)}...</small><br/>
+        <small style="direction: ltr; font-family: monospace; font-size: 11px;">Hash: ${txHash.substring(
+          0,
+          20
+        )}...</small><br/>
         <a href="${CONFIG.TRON_EXPLORER}/transaction/${txHash}" target="_blank" style="color: #0284c7; font-size: 12px;">
           🔍 View on Tronscan →
         </a>
-      `, 'pending');
+      `,
+        "pending"
+      );
 
-      // Check transaction confirmation
-      this.showPaymentStatus(CONFIG.MESSAGES.TX_CONFIRMING, 'pending');
-      
+      this.showPaymentStatus(CONFIG.MESSAGES.TX_CONFIRMING, "pending");
+
       const result = await cryptoPayment.waitForTransaction(txHash);
 
-      if (result === 'success') {
-        // Transaction confirmed
-        this.showPaymentStatus(CONFIG.MESSAGES.TX_SUCCESS, 'success');
+      if (result === "success") {
+        this.showPaymentStatus(CONFIG.MESSAGES.TX_SUCCESS, "success");
         this.showDownloadLink();
         this.disablePayButton(false);
-      } else if (result === 'failed') {
-        this.showPaymentStatus(CONFIG.MESSAGES.TX_FAILED, 'error');
+      } else if (result === "failed") {
+        this.showPaymentStatus(CONFIG.MESSAGES.TX_FAILED, "error");
         this.disablePayButton(false);
       } else {
-        this.showPaymentStatus(CONFIG.MESSAGES.TX_TIMEOUT, 'error');
+        this.showPaymentStatus(CONFIG.MESSAGES.TX_TIMEOUT, "error");
         this.disablePayButton(false);
       }
     } catch (error) {
-      console.error('Payment error:', error);
-      
-      let errorMessage = 'Error sending transaction';
+      console.error("Payment error:", error);
+
+      let errorMessage = "Error sending transaction";
       if (error.code === 4001) {
         errorMessage = CONFIG.MESSAGES.TX_CANCELLED;
       } else if (error.message) {
         errorMessage = error.message;
       }
 
-      this.showPaymentStatus(`❌ ${errorMessage}`, 'error');
+      this.showPaymentStatus(`❌ ${errorMessage}`, "error");
       this.disablePayButton(false);
     }
   }
@@ -212,9 +267,10 @@ class CryptoDirectApp {
    * Show download link
    */
   showDownloadLink() {
-    const statusDiv = document.getElementById('paymentStatus');
-    
-    if (this.selectedProduct.file) {
+    const statusDiv = document.getElementById("paymentStatus");
+    if (!statusDiv) return;
+
+    if (this.selectedProduct && this.selectedProduct.file) {
       statusDiv.innerHTML += `
         <div class="download-box">
           <strong>📥 Download File</strong><br/>
@@ -230,7 +286,9 @@ class CryptoDirectApp {
    * Show payment status message
    */
   showPaymentStatus(message, type) {
-    const statusDiv = document.getElementById('paymentStatus');
+    const statusDiv = document.getElementById("paymentStatus");
+    if (!statusDiv) return;
+
     statusDiv.innerHTML = `<div class="status-message ${type}">${message}</div>`;
   }
 
@@ -238,7 +296,7 @@ class CryptoDirectApp {
    * Disable pay button
    */
   disablePayButton(disabled) {
-    const btn = document.getElementById('payNowBtn');
+    const btn = document.getElementById("payNowBtn");
     if (btn) {
       btn.disabled = disabled;
     }
@@ -248,7 +306,10 @@ class CryptoDirectApp {
    * Close modal
    */
   closeModal() {
-    document.getElementById('paymentModal').classList.remove('active');
+    const modal = document.getElementById("paymentModal");
+    if (!modal) return;
+
+    modal.classList.remove("active");
     this.selectedProduct = null;
   }
 
@@ -256,26 +317,38 @@ class CryptoDirectApp {
    * Setup event listeners
    */
   setupEventListeners() {
-    // Close modal
-    document.getElementById('closeModal').addEventListener('click', () => {
-      this.closeModal();
-    });
+    const closeBtn = document.getElementById("closeModal");
+    const modal = document.getElementById("paymentModal");
+    const connectBtn = document.getElementById("connectWalletBtn");
 
-    // Close modal on outside click
-    document.getElementById('paymentModal').addEventListener('click', (e) => {
-      if (e.target.id === 'paymentModal') {
+    if (closeBtn) {
+      closeBtn.addEventListener("click", () => {
         this.closeModal();
-      }
-    });
+      });
+    }
 
-    // Connect wallet button
-    document.getElementById('connectWalletBtn').addEventListener('click', () => {
-      if (!cryptoPayment.isConnected()) {
-        cryptoPayment.connectWallet();
-      } else {
-        cryptoPayment.disconnectWallet();
-      }
-    });
+    if (modal) {
+      modal.addEventListener("click", e => {
+        if (e.target.id === "paymentModal") {
+          this.closeModal();
+        }
+      });
+    }
+
+    if (connectBtn) {
+      connectBtn.addEventListener("click", async () => {
+        if (typeof cryptoPayment === "undefined") {
+          alert("❌ Payment module not loaded.");
+          return;
+        }
+
+        if (!cryptoPayment.isConnected()) {
+          await cryptoPayment.connectWallet();
+        } else {
+          await cryptoPayment.disconnectWallet();
+        }
+      });
+    }
   }
 }
 
