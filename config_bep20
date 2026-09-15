@@ -1,0 +1,19 @@
+const CONFIG_BEP20 = {
+  USDT_CONTRACT_ADDRESS: "0x55d398326f99059fF775485246999027B3197955", // USDT-BEP20
+  USDT_DECIMALS: 18,
+
+  WC_PROJECT_ID: "db7319890f24e95d014692e0a729aac9",
+
+  USDT_ABI: [
+    {
+      "constant": false,
+      "inputs": [
+        { "name": "_to", "type": "address" },
+        { "name": "_value", "type": "uint256" }
+      ],
+      "name": "transfer",
+      "outputs": [{ "name": "", "type": "bool" }],
+      "type": "function"
+    }
+  ]
+};
